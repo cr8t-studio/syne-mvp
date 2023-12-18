@@ -7,12 +7,17 @@ import info from "../../Assets/Icons/Onboarding_Icons/info.svg";
 import Onboarding_Skip_Continue_Btns from "../../Components/Onboarding/Onboarding_Skip_Continue_Buttons/Onboarding_Skip_Continue_Buttons";
 import Onboarding_Alert_Modal from "../../Components/Onboarding/Onboarding_Alert_Modal/Onboarding_Alert_Modal";
 import { safari_input_styling } from "../../Components/Styles/Safari_Input_Styling";
+import { ReactMultiEmail } from "react-multi-email";
+import "./Styles/emailInput.css"
+// import exit from "/../../Assets/Icons/Onboarding_Icons/exit.svg";
+import exit from "../../Assets/Icons/Onboarding_Icons/exit.svg"
 
 export default function Onboarding_5() {
+  const [emails, setEmails] = useState([]);
+  const [focused, setFocused] = useState(false);
+  const [showLinkAlert, setShowLinkAlert] = useState(false); 
+  
   // Safari has an issue where its difficult to change input border-radius. This function detects a users browser, then injects classNames into create an outline
-
-  const [showLinkAlert, setShowLinkAlert] = useState(false);
-
   function detectBrowser() {
     if (navigator.userAgent.includes("Safari")) {
       return safari_input_styling;
@@ -35,14 +40,29 @@ export default function Onboarding_5() {
           action=''
           className='w-full max-w-[420px] h-auto flex flex-col gap-[24px] justify-center items-start gap-y-[24px]'
         >
-          <label hidden='hidden' for='emails'>
-            Emails:
-          </label>
-          <textarea
-            className={`${detectBrowser()} block w-full h-[110px] border py-[10px] px-[14px] border-[#ADB5BD] focus:border-[#556AEB] outline outline-1 outline-[#CED4DA] rounded-lg resize-none`}
-            placeholder='johndoe@gmail.com, janedoe@gmail.com, ...'
+          <label hidden='hidden' for='emails'>Emails:</label>
+          <ReactMultiEmail
             name='emails'
-          ></textarea>
+            placeholder='johndoe@gmail.com, janedoe@gmail.com, ...'
+            className={`${detectBrowser()}`}
+            emails={emails}
+            onChange={(_emails) => {
+              setEmails(_emails);
+            }}
+            autoFocus={true}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            getLabel={(email, index, removeEmail) => {
+              return (
+                <div data-tag key={index} className="bg-[#B9C4FF]">
+                  <div data-tag-item>{email}</div>
+                  <span data-tag-handle onClick={() => removeEmail(index)} >
+                    <img src={exit} alt="Close Icon"/>
+                  </span>
+                </div>
+              );
+            }}
+          />
           <button
             className='text-[#0A70E8] flex self-end'
             onClick={(e) => {
